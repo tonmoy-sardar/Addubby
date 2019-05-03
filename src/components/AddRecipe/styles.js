@@ -122,6 +122,16 @@ const styles = StyleSheet.create({
     paddingLeft:10,
     width:70,
   },
+  avatarContainer: {
+    borderColor: '#9B9B9B',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatar: {
+    borderRadius: 75,
+    width: 50,
+    height: 50,
+  },
 });
 
 export default styles;

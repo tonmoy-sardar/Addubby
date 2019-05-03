@@ -32,16 +32,18 @@ import searchLogo from './../../assets/search_logo.png';
 
 import iconAddCart from './../../assets/icon_add_cart.png';
 
-import { getListRestaurantRecipes } from '../../actions/RecipeActions';
-
 import ImageLoad from 'react-native-image-placeholder';
 
+import { getListRestaurantRecipes, getUserBookmarkRecipeList, bookmarkRecipe, unbookmarkRecipe,favoriteRecipe,unfavoriteRecipe } from '../../actions/RecipeActions';
+
+import { getUserDetails } from '../../actions/UserActions';
 class RestaurantRecipe extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
         token: '',
+        search:'',
         animating: true,
         recipeList:[]
     }
@@ -81,12 +83,96 @@ class RestaurantRecipe extends Component {
                         })
                     }
                 );
+                 // user details
+                this.getUserDetails().then(
+                    res => {                      
+                        this.setState({
+                            userName: res.data.data.username
+                            
+                        }, () => {
+                            this.getUserBookmarkRecipeList(this.state.userName).then(
+                                res => {
+                                    console.log("BookmarkRecipeList" + JSON.stringify(res.data));
+                                }
+                            )
+                        })
+                    }
+                );
             })
         }
         
     }
 
   getListRestaurantRecipes = () => this.props.getListRestaurantRecipes(this.state.token);
+
+  getUserDetails = () => this.props.getUserDetails(this.state.token);
+
+  getUserBookmarkRecipeList = (userName) => this.props.getUserBookmarkRecipeList(this.state.token, userName);
+
+  bookmarkRecipe = (data) => this.props.bookmarkRecipe(this.state.token, data);
+
+  unbookmarkRecipe = (data) => this.props.unbookmarkRecipe(this.state.token, data);
+  unfavoriteRecipe = (data) => this.props.unfavoriteRecipe(this.state.token, data);
+
+  addBookmarkRecipe = (id) => {
+    console.log(id)
+    var data = {
+        username: this.state.userName,
+        recipeid: id
+    }
+    console.log(data)    
+    this.bookmarkRecipe(data).then(
+        res => {
+            console.log("result"+ JSON.stringify(res.data))
+        }
+    )
+  };
+
+  removeBookmarkRecipe = (id) => {
+    console.log(id)
+    var data = {
+        username: this.state.userName,
+        recipeid: id
+    }
+    console.log(data)    
+    this.unbookmarkRecipe(data).then(
+        res => {
+            console.log("result"+ JSON.stringify(res.data))
+        }
+    )
+  };
+
+
+  favoriteRecipe = (data) => this.props.favoriteRecipe(this.state.token, data);
+
+  addFavoriteRecipe = (id) => {
+    console.log(id)
+    var data = {
+        username: this.state.userName,
+        recipeid: id
+    }
+    console.log(data)    
+    this.favoriteRecipe(data).then(
+        res => {
+            console.log("result"+ JSON.stringify(res.data))
+        }
+    )
+  };
+
+  removeFavoriteRecipe = (id) => {
+    console.log(id)
+    var data = {
+        username: this.state.userName,
+        recipeid: id
+    }
+    console.log(data)    
+    this.unfavoriteRecipe(data).then(
+        res => {
+            console.log("result"+ JSON.stringify(res.data))
+        }
+    )
+  };
+
 
   getMessage = () => {
     const { user } = this.props;
@@ -106,11 +192,10 @@ class RestaurantRecipe extends Component {
   }
 
   updateSearch = search => {
-    this.setState({ search });
+    this.setState({ search:search });
   };
-
   onEnd = () =>{
-    this.props.navigation.navigate('RestaurantSearch');
+    this.props.navigation.navigate('RestaurantSearch',{name: this.state.search});
   }
   
 
@@ -150,10 +235,36 @@ const recipeItems = this.state.recipeList.map((item, i) =>
             <View style={{ width: '100%',paddingLeft:10, paddingRight:10, height:50, backgroundColor: 'rgba(24, 24, 24, 0.5)',position:'absolute',top:200}}>
                 <View style={{flex: 1, flexDirection: 'row'}}>
                     <View style={{width: '70%', height: 50, justifyContent: 'center'}}>
-                        <Image source={iconBookmark} style={{width: 44, height: 30}} ></Image>
+                        {
+                        item.isBookmarked== false && (
+                            <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.addBookmarkRecipe(item.id)}>
+                            <Image source={iconBookmark} style={{width: 44, height: 30}} ></Image>
+                            </TouchableOpacity>
+                            )
+                        }
+                        {
+                        item.isBookmarked== true && (
+                            <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.removeBookmarkRecipe(item.id)}>
+                            <Image source={iconBookmark} style={{width: 44, height: 30}} ></Image>
+                            </TouchableOpacity>
+                         )
+                        }
                     </View>
                     <View style={{width: '15%', height: 50, justifyContent: 'center'}} >
-                        <Image source={iconLike} style={{width: 32, height: 30}} ></Image>
+                        {
+                        item.isFavorite== false && (
+                            <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.addFavoriteRecipe(item.id)}>
+                            <Image source={iconLike} style={{width: 32, height: 30}} ></Image>
+                            </TouchableOpacity>
+                            )
+                        }
+                        {
+                        item.isFavorite== true && (
+                            <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.removeFavoriteRecipe(item.id)}>
+                            <Image source={iconLike} style={{width: 32, height: 30}} ></Image>
+                            </TouchableOpacity>
+                         )
+                        }
                     </View>
                     <View style={{width: '15%', height: 50,justifyContent: 'center'}} >
                         <Image source={iconComment} style={{width: 34, height: 30}} ></Image>
@@ -185,7 +296,7 @@ return (
                         <Image source={searchLogo} style={{width: 38, height: 40}} ></Image>
                     </View>
                     <View style={{width: '85%', justifyContent: 'center'}} >
-                        <Searchbar style = {styles.searchInput} placeholder="Ingredients name,dish" onChangeText={this.updateSearch} value={search} onEndEditing={this.onEnd}/>
+                        <Searchbar style = {styles.searchInput} placeholder="Ingredients name,dish" onChangeText={this.updateSearch} value={this.state.search} onEndEditing={this.onEnd}/>
                         {/* <TextInput style = {styles.searchInput}  placeholder = "Ingredients name,dish" /> */}
                     </View>
                 </View>
@@ -218,6 +329,12 @@ return (
 
 RestaurantRecipe.propTypes = {
     getListRestaurantRecipes: PropTypes.func.isRequired,
+    getUserDetails: PropTypes.func.isRequired,
+    getUserBookmarkRecipeList: PropTypes.func.isRequired,
+    bookmarkRecipe: PropTypes.func.isRequired,
+    unbookmarkRecipe:PropTypes.func.isRequired,
+    favoriteRecipe: PropTypes.func.isRequired,
+    unfavoriteRecipe:PropTypes.func.isRequired,
     user: PropTypes.object,
 };
 
@@ -230,7 +347,13 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    getListRestaurantRecipes: (Token) => dispatch(getListRestaurantRecipes(Token)),    
+    getListRestaurantRecipes: (Token) => dispatch(getListRestaurantRecipes(Token)),
+    getUserDetails: (Token) => dispatch(getUserDetails(Token)),
+    getUserBookmarkRecipeList: (Token,userName) => dispatch(getUserBookmarkRecipeList(Token,userName)),
+    bookmarkRecipe: (Token,data) => dispatch(bookmarkRecipe(Token,data)),
+    unbookmarkRecipe: (Token,data) => dispatch(unbookmarkRecipe(Token,data)),
+    favoriteRecipe: (Token,data) => dispatch(favoriteRecipe(Token,data)),
+    unfavoriteRecipe: (Token,data) => dispatch(unfavoriteRecipe(Token,data)),   
 });
 
 

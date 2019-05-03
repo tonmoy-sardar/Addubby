@@ -235,9 +235,15 @@ class Region extends Component {
 							renderContainer={ renderContainer }
 						/>
 					</View>
-					<Text style={{
+					{/* <Text style={{
 						margin: 20,
-					}}>Selected accent: {this.state.checkListOption || 'none'}</Text>
+					}}>Selected accent: {this.state.checkListOption || 'none'}</Text> */}
+					<TouchableOpacity
+          style={styles.ContinueButtonStyle}
+          activeOpacity = { .5 }
+          onPress={() => this.GoToPage('Login')}>
+            <Text style={styles.TextStyle}> Continue </Text>
+        </TouchableOpacity>
 				</View>
 			</View>);
 
@@ -275,7 +281,7 @@ class Region extends Component {
 							checkedIcon='dot-circle-o'
   							uncheckedIcon='circle-o'
 							checked={this.state.checked1}
-							onPress={() => this.GoToPage('Login')}
+							
 							/>
 						</View>
 						{this.renderCheckList()}

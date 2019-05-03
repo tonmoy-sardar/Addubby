@@ -32,6 +32,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius:25,
   },
+  ContinueButtonStyle: {
+    fontFamily: "Lato Regular",
+    marginTop:20,
+    paddingTop:10,
+    paddingBottom:10,
+    paddingLeft:50,
+    paddingRight:50,
+    backgroundColor:'#d11c21',
+    borderRadius:20,
+    
+  },
+  TextStyle:{
+    fontFamily: "Lato Regular",
+    color:'#fff',
+    textAlign:'center',
+}
   
 });
 

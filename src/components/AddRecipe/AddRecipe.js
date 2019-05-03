@@ -27,6 +27,8 @@ import iconback from './../../assets/icon_back.png';
 import iconCamera from './../../assets/icon_camera.png';
 import btnAdd from './../../assets/btn_add.png';
 import { getUserDetails } from '../../actions/UserActions';
+import ImagePicker from 'react-native-image-picker';
+
 class AddRecipe extends Component {
 
     constructor(props) {
@@ -36,6 +38,7 @@ class AddRecipe extends Component {
             token: '',
             detailsData: {},
             animating: true,
+            avatarSource: null,
             data:{
                 name :'',
                 description:'',
@@ -48,13 +51,48 @@ class AddRecipe extends Component {
                     imageUrl:''
                 }
             }
-		 }
+         }
+         this.selectPhotoTapped = this.selectPhotoTapped.bind(this);
     }
 
     static navigationOptions = {
         header: null,
         tabBarVisible: false,
     };
+
+    selectPhotoTapped() {
+        const options = {
+          quality: 1.0,
+          maxWidth: 500,
+          maxHeight: 500,
+          storageOptions: {
+            skipBackup: true,
+          },
+        };
+    
+        ImagePicker.showImagePicker(options, (response) => {
+          console.log('Response = ', response);
+    
+          if (response.didCancel) {
+            console.log('User cancelled photo picker');
+          } else if (response.error) {
+            console.log('ImagePicker Error: ', response.error);
+          } else if (response.customButton) {
+            console.log('User tapped custom button: ', response.customButton);
+          } else {
+            let source = { uri: response.uri };
+    
+            // You can also display the image using data:
+            // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+    
+            this.setState({
+              avatarSource: source,
+            }, () => {
+                console.log("avatarSource-->"+this.state.avatarSource)
+            });
+          }
+        });
+      }
 
     componentDidMount()
     {
@@ -163,7 +201,7 @@ render() {
                     </View>
                 </View>
             </View>
-            <ScrollView contentContainerStyle={styles.contentContainer}>
+            <ScrollView contentContainerStyle={styles.contentContainer}>                
                 <View  style={{ margin: 10,}}>
                     <View style={{width: '100%', justifyContent: 'center'}} >
                         <TextInput style = {styles.formInput}  placeholder = "Recipe Title" onChangeText={(text)=>this.changeAndSetText(text,'name')} value={this.state.data.name}/>
@@ -188,7 +226,20 @@ render() {
                     <View style={{ width: '100%'}}>
                         <View style={{flex: 1, flexDirection: 'row'}}>
                             <View style={{width: '100%', padding:30, justifyContent: 'center',alignItems: 'center',}}>
-                                <Image source={iconCamera} style={{width: 51, height: 40}} ></Image>
+                                
+                                <TouchableOpacity onPress={this.selectPhotoTapped.bind(this)}>
+                                        <View style={[
+                                styles.avatar,
+                                styles.avatarContainer,
+                                
+                                ]}>
+                                    {this.state.avatarSource === null ? (
+                                    <Image source={iconCamera} style={{width: 51, height: 40}} ></Image>
+                                    ) : (
+                                    <Image style = {styles.avatar} source={this.state.avatarSource} />
+                                    )}
+                                </View>
+                                </TouchableOpacity>
                                 {/* <PhotoUpload
                                     onPhotoSelect={avatar1 => {
                                         if (avatar1) {
@@ -412,12 +463,12 @@ render() {
                 </View>
                 <View  style={{width: '100%', margin: 10,paddingLeft:20,paddingRight:20,paddingBottom:40,}}>
                     <View style={{flex: 1, flexDirection: 'row'}}>
-                        <View style={{width: '90%', justifyContent: 'center'}} >
+                        <View style={{width: '80%', justifyContent: 'center'}} >
                             <Text style={TextStyles.blackTextTitle}>Allow Comments</Text>
                             <Text style={styles.grayText}>All users van comment on your recipeand any comments 
 will be publicly visible.</Text>
                         </View>
-                        <View style={{width: '10%', justifyContent: 'center',alignItems: 'flex-end',}} >
+                        <View style={{width: '20%',paddingLeft:20, justifyContent: 'center',alignItems: 'flex-end',}} >
                             <Switch thumbColor="#d11c21" trackColor="#f6d2d3" onValueChange = {this.toggleSwitch} value = {this.state.switchValue}/>
                         </View>
                     </View>

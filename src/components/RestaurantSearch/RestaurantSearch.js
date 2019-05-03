@@ -5,6 +5,8 @@ import {
     Image,
     ScrollView,
     TextInput,
+    ActivityIndicator,
+    TouchableOpacity,
 } from 'react-native';
 
 import { Avatar } from 'react-native-elements';
@@ -25,10 +27,22 @@ import bookmark2Image from './../../assets/bookmark2.png';
 
 import searchLogo from './../../assets/search_logo.png';
 
+import { searchRecipe }from '../../actions/RecipeActions';
+
+import { getUserDetails } from '../../actions/UserActions';
+import ImageLoad from 'react-native-image-placeholder';
+
 class RestaurantSearch extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            token: '',
+            search:'',
+            animating: true,
+            recipeList:[],
+            userName: ''
+        }
     }
 
     static navigationOptions = {
@@ -40,6 +54,51 @@ class RestaurantSearch extends Component {
         search: '',
     };
 
+    componentDidMount()
+  {
+        if(this.props.user!=null)
+		{
+            console.log("1--")
+            console.log('2--'+ JSON.stringify(this.props.user.data));
+
+            this.state.token = this.props.user.data;
+            this.setState({
+                token: this.props.user.data,
+                search:this.props.navigation.state.params.name,  
+            }, () => {
+                this.searchRecipe().then(
+                    res => {
+                        console.log(res.data)
+                        this.state.recipeList=res.data;
+                        this.setState({
+                            recipeList: res.data.data,
+                            animating: false,
+                            
+                        }, () => {
+                            console.log('ddddd3:'+ JSON.stringify(this.state.recipeList));
+                        })
+                    }
+                );
+                // user details
+                this.getUserDetails().then(
+                    res => {                      
+                        this.setState({
+                            userName: res.data.data.username
+                            
+                        }, () => {
+                            
+                        })
+                    }
+                );
+            })
+
+        }
+        
+    }
+
+    searchRecipe = () => this.props.searchRecipe(this.state.token,this.state.search);
+    getUserDetails = () => this.props.getUserDetails(this.state.token);
+
     getMessage = () => {
         const { user } = this.props;
         return `${strings.homeMessage} ${user && user.name}`;
@@ -50,11 +109,11 @@ class RestaurantSearch extends Component {
     }
 
     updateSearch = search => {
-        this.setState({ search });
+        this.setState({ search:search });
     };
-
     onEnd = () =>{
-    this.props.navigation.navigate('RestaurantSearch');
+        this.searchRecipe(this.state.search)
+        //this.props.navigation.navigate('RestaurantSearch');
     }
 
 
@@ -78,10 +137,34 @@ class RestaurantSearch extends Component {
         console.log("Details")
     }
 
+    GoDetailspage = (id) =>{
+        console.log(id);
+      this.props.navigation.navigate('RecipeDetails',{id: id});
+    }
+
 
     render() {
         const { search } = this.state;
         const MoreIcon = require("./../../assets/option_menu_black.png");
+        const recipeItems = this.state.recipeList.map((item, i) =>
+
+            <View style={[styles.cardContainer]} key={i}>
+                <View style={{ width: '100%'}}>
+                    <View style={{flex: 1, flexDirection: 'row'}}>
+                        <View style={{width: '30%', justifyContent: 'center'}} >
+                            <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.GoDetailspage(item.id)}>
+                            <ImageLoad style={{width: '100%', height: 100}}  loadingStyle={{ size: 'large', color: 'blue' }}
+                            source={{ uri: item.imageUrl }}/>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{width: '70%', padding:20}}>
+                            <Text style={TextStyles.redTextTitle}>{item.name}</Text>
+                            <Text style={TextStyles.grayText}>{item.description}</Text>
+                        </View>
+                    </View>
+                </View>
+            </View>
+        )
         return (
             <View style={{flex: 1}}>
                 <View style={{ width: '100%' ,backgroundColor:'#f8f8f8', height:50,paddingLeft:10, paddingRight:10,}}>
@@ -90,104 +173,27 @@ class RestaurantSearch extends Component {
                             <Image source={searchLogo} style={{width: 38, height: 40}} ></Image>
                         </View>
                         <View style={{width: '85%', justifyContent: 'center'}} >
-                        <Searchbar style = {styles.searchInput} placeholder="Search" onChangeText={this.updateSearch} value={search}/>
+                        <Searchbar style = {styles.searchInput} placeholder="Search" onChangeText={this.updateSearch} value={this.state.search} onEndEditing={this.onEnd}/>
                             {/* <TextInput style = {styles.searchInput}  placeholder = "Search" /> */}
                         </View>
                     </View>
                 </View>
                 <ScrollView contentContainerStyle={styles.contentContainer}>
-                    <View style={{ width: '100%' , paddingLeft:20, paddingRight:20}}>
-                        <View style={{flex: 1, flexDirection: 'row'}}>
-                            <View style={{width: '15%', height: 50, justifyContent: 'center'}} >
-                                <Avatar rounded icon={{ name: 'user',type: 'font-awesome' }}  />
-                            </View>
-                            <View style={{width: '75%', height: 50, justifyContent: 'center'}}>
-                                <Text style={TextStyles.blackText}>Japanese Restaurant</Text>
-                            </View>
+                    {
+                        this.state.animating== true && (
+                        <View style={[styles.activeContainer, TextStyles.horizontal]}>
+                            <ActivityIndicator size="large" color="#d11c21" animating={this.state.animating} />
+                        </View>
+                        )
+                    }
+                    {
+                        this.state.animating== false && (
+                        <View style={{ flex: 1 }} underlayColor='white'>
                             
-                            <View style={{width: '10%', height: 50,justifyContent: 'center'}} >
-                                <OptionsMenu button={MoreIcon} buttonStyle={{ width: 10, height: 19,marginLeft: 15, resizeMode: "contain" }} destructiveIndex={1} options={["Details"]} actions={[this.DetailsView]}/>
-                            </View>
+                            {recipeItems}
                         </View>
-                    </View>
-                    <View style={[styles.cardContainer]} >
-                        <View style={{ width: '100%'}}>
-                            <View style={{flex: 1, flexDirection: 'row'}}>
-                                <View style={{width: '30%', justifyContent: 'center'}} >
-                                    <Image source={bookmarkImage} style={{width: '100%', height: 100,borderTopLeftRadius:10,borderBottomLeftRadius:10,}} ></Image>
-                                </View>
-                                <View style={{width: '70%', padding:20}}>
-                                    <Text style={TextStyles.redTextTitle}>Beef Steak</Text>
-                                    <Text style={TextStyles.grayText}>Classic Lightly mix 6 ounces ground beef....</Text>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={[styles.cardContainer]} >
-                        <View style={{ width: '100%'}}>
-                            <View style={{flex: 1, flexDirection: 'row'}}>
-                                <View style={{width: '30%', justifyContent: 'center'}} >
-                                    <Image source={bookmark2Image} style={{width: '100%', height: 100,borderTopLeftRadius:10,borderBottomLeftRadius:10,}} ></Image>
-                                </View>
-                                <View style={{width: '70%', padding:20}}>
-                                    <Text style={TextStyles.redTextTitle}>Veg Burger</Text>
-                                    <Text style={TextStyles.grayText}>Cheese Make Classic Burger...</Text>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={[styles.cardContainer]} >
-                        <View style={{ width: '100%'}}>
-                            <View style={{flex: 1, flexDirection: 'row'}}>
-                                <View style={{width: '30%', justifyContent: 'center'}} >
-                                    <Image source={bookmark1Image} style={{width: '100%', height: 100,borderTopLeftRadius:10,borderBottomLeftRadius:10,}} ></Image>
-                                </View>
-                                <View style={{width: '70%', padding:20}}>
-                                    <Text style={TextStyles.redTextTitle}>Lasguna mutton</Text>
-                                    <Text style={TextStyles.grayText}>Caramelized Onion Cook 2 sliced red....</Text>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={[styles.cardContainer]} >
-                        <View style={{ width: '100%'}}>
-                            <View style={{flex: 1, flexDirection: 'row'}}>
-                                <View style={{width: '30%', justifyContent: 'center'}} >
-                                    <Image source={bookmarkImage} style={{width: '100%', height: 100,borderTopLeftRadius:10,borderBottomLeftRadius:10,}} ></Image>
-                                </View>
-                                <View style={{width: '70%', padding:20}}>
-                                    <Text style={TextStyles.redTextTitle}>Beef Steak</Text>
-                                    <Text style={TextStyles.grayText}>Classic Lightly mix 6 ounces ground beef....</Text>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={[styles.cardContainer]} >
-                        <View style={{ width: '100%'}}>
-                            <View style={{flex: 1, flexDirection: 'row'}}>
-                                <View style={{width: '30%', justifyContent: 'center'}} >
-                                    <Image source={bookmark2Image} style={{width: '100%', height: 100,borderTopLeftRadius:10,borderBottomLeftRadius:10,}} ></Image>
-                                </View>
-                                <View style={{width: '70%', padding:20}}>
-                                    <Text style={TextStyles.redTextTitle}>Veg Burger</Text>
-                                    <Text style={TextStyles.grayText}>Cheese Make Classic Burger...</Text>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={[styles.cardContainer]} >
-                        <View style={{ width: '100%'}}>
-                            <View style={{flex: 1, flexDirection: 'row'}}>
-                                <View style={{width: '30%', justifyContent: 'center'}} >
-                                    <Image source={bookmark1Image} style={{width: '100%', height: 100,borderTopLeftRadius:10,borderBottomLeftRadius:10,}} ></Image>
-                                </View>
-                                <View style={{width: '70%', padding:20}}>
-                                    <Text style={TextStyles.redTextTitle}>Lasguna mutton</Text>
-                                    <Text style={TextStyles.grayText}>Caramelized Onion Cook 2 sliced red....</Text>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
+                        )
+                    }
                 </ScrollView>
                 <Footer ></Footer>
             </View>
@@ -196,6 +202,8 @@ class RestaurantSearch extends Component {
     }
 
     RestaurantSearch.propTypes = {
+        searchRecipe: PropTypes.func.isRequired,
+        getUserDetails: PropTypes.func.isRequired,
         user: PropTypes.object,
     };
 
@@ -207,5 +215,9 @@ class RestaurantSearch extends Component {
         user: getUser(state),
     });
 
-    const mapDispatchToProps = () => ({});
+    const mapDispatchToProps = dispatch => ({
+        searchRecipe: (Token,name) => dispatch(searchRecipe(Token,name)),
+        getUserDetails: (Token) => dispatch(getUserDetails(Token)),
+        
+    });
 export default connect(mapStateToProps, mapDispatchToProps)(RestaurantSearch);

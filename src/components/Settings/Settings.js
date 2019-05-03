@@ -100,6 +100,18 @@ class Settings extends Component {
 						</TouchableOpacity>
 					</View>
 					<View style={[styles.cardContainer]} >
+						<TouchableOpacity style={{height:50}} onPress={()=>this.GoToPage('Favorite')}>
+							<View style={{flex: 1, flexDirection: 'row'}}>
+								<View style={{width: '20%', justifyContent: 'center',alignItems: 'flex-end',}} >
+								<Image source={iconProfileEdit} style={{width: 20, height: 20}} ></Image>
+								</View>
+								<View style={{width: '80%', justifyContent: 'center', paddingLeft:15,}}>
+									<Text style={TextStyles.blackTextTitle}>Favorite</Text>
+								</View>
+							</View>
+						</TouchableOpacity>
+					</View>
+					<View style={[styles.cardContainer]} >
 						<TouchableOpacity style={{height:50}} onPress={()=>this.GoToPage('EditProfile')}>
 							<View style={{flex: 1, flexDirection: 'row'}}>
 								<View style={{width: '20%', justifyContent: 'center',alignItems: 'flex-end',}} >

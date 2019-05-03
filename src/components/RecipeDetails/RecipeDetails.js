@@ -25,8 +25,8 @@ import iconLike from './../../assets/icon_like.png';
 import iconComment from './../../assets/icon_comment.png';
 import btnAddCart from './../../assets/btn_add_to_cart.png';
 
-import { getRecipeDetails } from '../../actions/RecipeActions';
-
+import { getRecipeDetails,bookmarkRecipe, unbookmarkRecipe,favoriteRecipe,unfavoriteRecipe } from '../../actions/RecipeActions';
+import { getUserDetails } from '../../actions/UserActions';
 
 class RecipeDetails extends Component {
 
@@ -77,11 +77,87 @@ class RecipeDetails extends Component {
                         })
                     }
                 );
+                this.getUserDetails().then(
+                    res => {                      
+                        this.setState({
+                            userName: res.data.data.username
+                            
+                        }, () => {
+                            
+                        })
+                    }
+                );
             })
     }
 
 
     getRecipeDetails = () => this.props.getRecipeDetails(this.state.token,this.state.id);
+
+    getUserDetails = () => this.props.getUserDetails(this.state.token);
+
+    bookmarkRecipe = (data) => this.props.bookmarkRecipe(this.state.token, data);
+
+    unbookmarkRecipe = (data) => this.props.unbookmarkRecipe(this.state.token, data);
+    unfavoriteRecipe = (data) => this.props.unfavoriteRecipe(this.state.token, data);
+
+    addBookmarkRecipe = (id) => {
+        console.log(id)
+        var data = {
+            username: this.state.userName,
+            recipeid: id
+        }
+        console.log(data)    
+        this.bookmarkRecipe(data).then(
+            res => {
+                console.log("result"+ JSON.stringify(res.data))
+            }
+        )
+    };
+
+    removeBookmarkRecipe = (id) => {
+        console.log(id)
+        var data = {
+            username: this.state.userName,
+            recipeid: id
+        }
+        console.log(data)    
+        this.unbookmarkRecipe(data).then(
+            res => {
+                console.log("result"+ JSON.stringify(res.data))
+            }
+        )
+      };
+
+    favoriteRecipe = (data) => this.props.favoriteRecipe(this.state.token, data);
+
+    addFavoriteRecipe = (id) => {
+        console.log(id)
+        var data = {
+            username: this.state.userName,
+            recipeid: id
+        }
+        console.log(data)    
+        this.favoriteRecipe(data).then(
+            res => {
+                console.log("result"+ JSON.stringify(res.data))
+            }
+        )
+    };
+
+    removeFavoriteRecipe = (id) => {
+        console.log(id)
+        var data = {
+            username: this.state.userName,
+            recipeid: id
+        }
+        console.log(data)    
+        this.unfavoriteRecipe(data).then(
+            res => {
+                console.log("result"+ JSON.stringify(res.data))
+            }
+        )
+      };
+    
 
     getMessage = () => {
         const { user } = this.props;
@@ -192,10 +268,38 @@ class RecipeDetails extends Component {
                     <View style={{ width: '100%',paddingLeft:10, paddingRight:10, height:50, backgroundColor: 'rgba(24, 24, 24, 0.5)',position:'absolute',top:0}}>
                         <View style={{flex: 1, flexDirection: 'row'}}>
                             <View style={{width: '70%', height: 50, justifyContent: 'center'}}>
-                                <Image source={iconBookmark} style={{width: 44, height: 30}} ></Image>
+                            {
+                                this.state.detailsData.isBookmarked== false && (
+                                    <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.addBookmarkRecipe(this.state.detailsData.id)}>
+                                    <Image source={iconBookmark} style={{width: 44, height: 30}} ></Image>
+                                    </TouchableOpacity>
+                                    )
+                                }
+                                {
+                                this.state.detailsData.isBookmarked== true && (
+                                    <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.removeBookmarkRecipe(this.state.detailsData.id)}>
+                                    <Image source={iconBookmark} style={{width: 44, height: 30}} ></Image>
+                                    </TouchableOpacity>
+                                )
+                                }
+                                
                             </View>
                             <View style={{width: '15%', height: 50, justifyContent: 'center'}} >
-                                <Image source={iconLike} style={{width: 32, height: 30}} ></Image>
+                                
+                                {
+                                this.state.detailsData.isFavorite== false && (
+                                    <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.addFavoriteRecipe(this.state.detailsData.id)}>
+                                    <Image source={iconLike} style={{width: 32, height: 30}} ></Image>
+                                    </TouchableOpacity>
+                                    )
+                                }
+                                {
+                                this.state.detailsData.isFavorite== true && (
+                                    <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.removeFavoriteRecipe(this.state.detailsData.id)}>
+                                    <Image source={iconLike} style={{width: 32, height: 30}} ></Image>
+                                    </TouchableOpacity>
+                                )
+                                }
                             </View>
                             <View style={{width: '15%', height: 50,justifyContent: 'center'}} >
                                 <Image source={iconComment} style={{width: 34, height: 30}} ></Image>
@@ -249,6 +353,11 @@ class RecipeDetails extends Component {
 
 RecipeDetails.propTypes = {
     getRecipeDetails: PropTypes.func.isRequired,
+    getUserDetails: PropTypes.func.isRequired,
+    bookmarkRecipe: PropTypes.func.isRequired,
+    unbookmarkRecipe:PropTypes.func.isRequired,
+    favoriteRecipe: PropTypes.func.isRequired,
+    unfavoriteRecipe:PropTypes.func.isRequired,
     user: PropTypes.object,
 };
 
@@ -261,7 +370,12 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    getRecipeDetails: (Token,id) => dispatch(getRecipeDetails(Token,id)),    
+    getRecipeDetails: (Token,id) => dispatch(getRecipeDetails(Token,id)),
+    getUserDetails: (Token) => dispatch(getUserDetails(Token)),
+    bookmarkRecipe: (Token,data) => dispatch(bookmarkRecipe(Token,data)),
+    unbookmarkRecipe: (Token,data) => dispatch(unbookmarkRecipe(Token,data)),
+    favoriteRecipe: (Token,data) => dispatch(favoriteRecipe(Token,data)),
+    unfavoriteRecipe: (Token,data) => dispatch(unfavoriteRecipe(Token,data)),    
 });
 
 

@@ -19,25 +19,22 @@ import styles from './styles';
 import Footer from '../common/Footer';
 
 
-import bookmarkImage from './../../assets/bookmark.png';
-import bookmark1Image from './../../assets/bookmark1.png';
-import bookmark2Image from './../../assets/bookmark2.png';
+
 
 import searchLogo from './../../assets/search_logo.png';
 import ImageLoad from 'react-native-image-placeholder';
 
-import { getUserBookmarkRecipeList,searchInBookmarks} from '../../actions/RecipeActions';
+import { getUserFavoriteRecipeList } from '../../actions/RecipeActions';
 import { getUserDetails } from '../../actions/UserActions';
 
-class Bookmark extends Component {
+class Favorite extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             token: '',
-            search:'',
             animating: true,
-            bookmarkList:[],
+            favoriteList:[],
             userName: ''
         }
     }
@@ -47,9 +44,9 @@ class Bookmark extends Component {
         tabBarVisible: false,
     };
 
-    // state = {
-    //     search: '',
-    // };
+    state = {
+        search: '',
+    };
 
 
     componentDidMount()
@@ -70,17 +67,17 @@ class Bookmark extends Component {
                             userName: res.data.data.username
                             
                         }, () => {
-                            this.getUserBookmarkRecipeList(this.state.userName).then(
+                            this.getUserFavoriteRecipeList(this.state.userName).then(
                                 res => {
-                                    console.log("BookmarkRecipeList" + JSON.stringify(res.data));
+                                    console.log("FavoriteRecipeList" + JSON.stringify(res.data));
                                     console.log(res.data)
-                                    this.state.bookmarkList=res.data;
+                                    this.state.favoriteList=res.data;
                                     this.setState({
-                                        bookmarkList: res.data.data,
+                                        favoriteList: res.data.data,
                                         animating: false,
                                         
                                     }, () => {
-                                        console.log('ddddd3:'+ JSON.stringify(this.state.bookmarkList));
+                                        console.log('ddddd3:'+ JSON.stringify(this.state.favoriteList));
                                     })
                                 }
                             )
@@ -97,29 +94,9 @@ class Bookmark extends Component {
 
   getUserDetails = () => this.props.getUserDetails(this.state.token);
 
-  getUserBookmarkRecipeList = (userName) => this.props.getUserBookmarkRecipeList(this.state.token, userName);
-  searchInBookmarks = (data) => this.props.searchInBookmarks(this.state.token, data);
+  getUserFavoriteRecipeList = (userName) => this.props.getUserFavoriteRecipeList(this.state.token, userName);
+
   
-  searchBookmarks = (name) => {
-    console.log(name)
-    var data = {
-        username: this.state.userName,
-        name: name
-    }
-    console.log(data)    
-    this.searchInBookmarks(data).then(
-        res => {
-            console.log("result"+ JSON.stringify(res.data))
-            console.log(res.data)
-            this.state.bookmarkList=res.data;
-            this.setState({
-                bookmarkList: res.data.data,
-            }, () => {
-                console.log('ddddd3:'+ JSON.stringify(this.state.bookmarkList));
-            })
-        }
-    )
-  };
 
   GoDetailspage = (id) =>{
       console.log(id);
@@ -133,25 +110,24 @@ class Bookmark extends Component {
     }
 
     updateSearch = search => {
-        this.setState({ search:search });
+        this.setState({ search });
     };
     onEnd = () =>{
-        this.searchBookmarks(this.state.search)
-        //this.props.navigation.navigate('RestaurantSearch');
+    this.props.navigation.navigate('RestaurantSearch');
     }
 
 
 
 render() {
-    //const { search } = this.state;
-    const bookmarkItems = this.state.bookmarkList.map((item, i) =>
+    const { search } = this.state;
+    const favoriteItems = this.state.favoriteList.map((item, i) =>
 
     <View style={[styles.cardContainer]}  key={i}>
         <View style={{ width: '100%'}}>
             <View style={{flex: 1, flexDirection: 'row'}}>
                 <View style={{width: '30%', justifyContent: 'center'}} >
                     <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.GoDetailspage(item.id)}>
-                    {/* <Image source={bookmarkImage} style={{width: '100%', height: 100,borderTopLeftRadius:10,borderBottomLeftRadius:10,}} ></Image> */}
+                    
                     <ImageLoad style={{width: '100%', height: 100}}  loadingStyle={{ size: 'large', color: 'blue' }}
                         source={{ uri: item.imageUrl }}/>
                     </TouchableOpacity>
@@ -172,7 +148,7 @@ render() {
                         <Image source={searchLogo} style={{width: 38, height: 40}} ></Image>
                     </View>
                     <View style={{width: '85%', justifyContent: 'center'}} >
-                    <Searchbar style = {styles.searchInput} placeholder="Bookmark" onChangeText={this.updateSearch} value={this.state.search} onEndEditing={this.onEnd}/>
+                    <Searchbar style = {styles.searchInput} placeholder="Favorite" onChangeText={this.updateSearch} value={search}/>
                     </View>
                 </View>
             </View>
@@ -189,7 +165,7 @@ render() {
                     this.state.animating== false && (
                     <View style={{ flex: 1 }} underlayColor='white'>
                         
-                        {bookmarkItems}
+                        {favoriteItems}
                     </View>
                     )
                 }
@@ -203,15 +179,14 @@ render() {
 
 
 
-Bookmark.propTypes = {
+Favorite.propTypes = {
    
     getUserDetails: PropTypes.func.isRequired,
-    getUserBookmarkRecipeList: PropTypes.func.isRequired,
-    searchInBookmarks: PropTypes.func.isRequired,
+    getUserFavoriteRecipeList: PropTypes.func.isRequired,
     user: PropTypes.object,
 };
 
-Bookmark.defaultProps = {
+Favorite.defaultProps = {
     user: null,
 };
 
@@ -221,7 +196,6 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     getUserDetails: (Token) => dispatch(getUserDetails(Token)),
-    getUserBookmarkRecipeList: (Token,userName) => dispatch(getUserBookmarkRecipeList(Token,userName)),
-    searchInBookmarks: (Token,data) => dispatch(searchInBookmarks(Token,data)),
+    getUserFavoriteRecipeList: (Token,userName) => dispatch(getUserFavoriteRecipeList(Token,userName)),
 });
-export default connect(mapStateToProps, mapDispatchToProps)(Bookmark);
+export default connect(mapStateToProps, mapDispatchToProps)(Favorite);

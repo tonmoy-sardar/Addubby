@@ -16,6 +16,7 @@ import EditProfile from '../EditProfile';
 import RestaurantDetails from '../RestaurantDetails';
 import RecipeDetails from '../RecipeDetails';
 import Bookmark from '../Bookmark';
+import Favorite from '../Favorite';
 import Settings from '../Settings';
 import RestaurantSearch from '../RestaurantSearch';
 import Restaurant from '../Restaurant';
@@ -79,6 +80,7 @@ const AppStack = createStackNavigator(
     RecipeDetails:RecipeDetails,
     RestaurantDetails:RestaurantDetails,
     Bookmark:Bookmark,
+    Favorite:Favorite,
     Settings:Settings,
     RestaurantSearch:RestaurantSearch,
     Restaurant:Restaurant,
