@@ -58,8 +58,6 @@ class RestaurantSearch extends Component {
   {
         if(this.props.user!=null)
 		{
-            console.log("1--")
-            console.log('2--'+ JSON.stringify(this.props.user.data));
 
             this.state.token = this.props.user.data;
             this.setState({
@@ -68,14 +66,13 @@ class RestaurantSearch extends Component {
             }, () => {
                 this.searchRecipe().then(
                     res => {
-                        console.log(res.data)
+
                         this.state.recipeList=res.data;
                         this.setState({
                             recipeList: res.data.data,
                             animating: false,
                             
                         }, () => {
-                            console.log('ddddd3:'+ JSON.stringify(this.state.recipeList));
                         })
                     }
                 );
@@ -113,7 +110,7 @@ class RestaurantSearch extends Component {
     };
     onEnd = () =>{
         this.searchRecipe(this.state.search)
-        //this.props.navigation.navigate('RestaurantSearch');
+
     }
 
 
@@ -130,15 +127,14 @@ class RestaurantSearch extends Component {
     }
 
     toggleStatus = () =>{
-    //this.state.textBoxShow = true;
+
     }
 
     DetailsView = () =>{
-        console.log("Details")
+
     }
 
     GoDetailspage = (id) =>{
-        console.log(id);
       this.props.navigation.navigate('RecipeDetails',{id: id});
     }
 

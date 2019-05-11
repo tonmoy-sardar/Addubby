@@ -60,7 +60,6 @@ class SignUp extends Component {
         {
             if(text=='')
             {
-                console.log('invalid');
                 values['Name'] = text;
                 this.setState({ data: values });
                 this.setState({ 
@@ -137,13 +136,11 @@ class SignUp extends Component {
 
     componentDidUpdate() {
        
-        //console.log(this.state.data);
         this.navigateToHomeIfLogged();
         return null;
     }
 
     navigateToHomeIfLogged = () => {
-        //console.log('user:'+this.props.user);
         
         if (this.props.user !== null) {
            
@@ -176,11 +173,8 @@ class SignUp extends Component {
         values['RepeatPassword'] = value;
         this.setState({ data: values })
 
-        console.log(this.state.data)
     }
 
-
-    //signUp = () => this.props.signUp(this.state.data);
 
     signUp = () => {
 
@@ -211,13 +205,7 @@ class SignUp extends Component {
         }
         
     };
-    // signUp = () => {
-    //     this.props.signUp(this.state.data).then(
-    //         res => {
-    //             console.log(res.data);
-    //         }
-    //     )
-    // };
+    
    
 
     render() {

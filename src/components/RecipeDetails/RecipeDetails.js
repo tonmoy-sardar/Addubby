@@ -20,9 +20,17 @@ import styles from './styles';
 import OptionsMenu from "react-native-options-menu";
 import Footer from '../common/Footer';
 
-import iconBookmark from './../../assets/icon_bookmark.png';
-import iconLike from './../../assets/icon_like.png';
-import iconComment from './../../assets/icon_comment.png';
+//import iconBookmark from './../../assets/icon_bookmark.png';
+//import iconBookmarkActive from './../../assets/icon_bookmark_active.png';
+import iconBookmark from './../../assets/tag.png';
+import iconBookmarkActive from './../../assets/tag_active.png';
+//import iconLike from './../../assets/icon_like.png';
+//import iconLikeActive from './../../assets/icon_like_active.png';
+
+import iconLike from './../../assets/heart.png';
+import iconLikeActive from './../../assets/heart_active.png';
+import iconComment from './../../assets/conversation.png';
+import iconCommentActive from './../../assets/conversation_active.png';
 import btnAddCart from './../../assets/btn_add_to_cart.png';
 
 import { getRecipeDetails,bookmarkRecipe, unbookmarkRecipe,favoriteRecipe,unfavoriteRecipe } from '../../actions/RecipeActions';
@@ -72,8 +80,6 @@ class RecipeDetails extends Component {
                             animating: false,
                             dataSource: urlData
                         }, () => {
-                            console.log('ddddd1:'+ JSON.stringify(this.state.detailsData));
-                            console.log('ddddd3:'+ JSON.stringify(this.state.dataSource));
                         })
                     }
                 );
@@ -101,29 +107,38 @@ class RecipeDetails extends Component {
     unfavoriteRecipe = (data) => this.props.unfavoriteRecipe(this.state.token, data);
 
     addBookmarkRecipe = (id) => {
-        console.log(id)
+
         var data = {
             username: this.state.userName,
             recipeid: id
         }
-        console.log(data)    
+ 
         this.bookmarkRecipe(data).then(
             res => {
-                console.log("result"+ JSON.stringify(res.data))
+ 
+                let values = {...this.state.detailsData}
+                values['isBookmarked'] = true
+                this.setState({
+                    detailsData: values
+                })
             }
         )
     };
 
     removeBookmarkRecipe = (id) => {
-        console.log(id)
+
         var data = {
             username: this.state.userName,
             recipeid: id
         }
-        console.log(data)    
+
         this.unbookmarkRecipe(data).then(
             res => {
-                console.log("result"+ JSON.stringify(res.data))
+                let values = {...this.state.detailsData}
+                values['isBookmarked'] = false
+                this.setState({
+                    detailsData: values
+                })
             }
         )
       };
@@ -131,29 +146,38 @@ class RecipeDetails extends Component {
     favoriteRecipe = (data) => this.props.favoriteRecipe(this.state.token, data);
 
     addFavoriteRecipe = (id) => {
-        console.log(id)
+
         var data = {
             username: this.state.userName,
             recipeid: id
         }
-        console.log(data)    
+
         this.favoriteRecipe(data).then(
             res => {
-                console.log("result"+ JSON.stringify(res.data))
+                let values = {...this.state.detailsData}
+                values['isFavorite'] = true
+                this.setState({
+                    detailsData: values
+                })
             }
         )
     };
 
     removeFavoriteRecipe = (id) => {
-        console.log(id)
+
         var data = {
             username: this.state.userName,
             recipeid: id
         }
-        console.log(data)    
+
         this.unfavoriteRecipe(data).then(
             res => {
-                console.log("result"+ JSON.stringify(res.data))
+
+                let values = {...this.state.detailsData}
+                values['isFavorite'] = false
+                this.setState({
+                    detailsData: values
+                })
             }
         )
       };
@@ -169,7 +193,7 @@ class RecipeDetails extends Component {
     }
 
     DetailsView = () =>{
-    console.log("Details")
+
     }
 
     componentWillMount() {
@@ -237,17 +261,6 @@ class RecipeDetails extends Component {
     render() {
         const MoreIcon = require("./../../assets/option_menu.png");
 
-        // const ingredientItems = this.state.detailsData.ingredients.map((item, i) =>
-        //     <View >
-        //         <View style={{ paddingBottom:5}}>
-        //             <Text style={TextStyles.blackTextTitle}>{item.section}</Text>
-        //         </View>
-        //         <View style={{ paddingBottom:15}}>
-        //             <Text style={styles.grayText}>{item.ingredient.label}</Text>
-        //         </View>
-        //     </View>
-        // )
-        
         return (
             <View style={{flex: 1}}>
                 {
@@ -271,14 +284,14 @@ class RecipeDetails extends Component {
                             {
                                 this.state.detailsData.isBookmarked== false && (
                                     <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.addBookmarkRecipe(this.state.detailsData.id)}>
-                                    <Image source={iconBookmark} style={{width: 44, height: 30}} ></Image>
+                                    <Image source={iconBookmark} style={{width: 32, height: 32}} ></Image>
                                     </TouchableOpacity>
                                     )
                                 }
                                 {
                                 this.state.detailsData.isBookmarked== true && (
                                     <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.removeBookmarkRecipe(this.state.detailsData.id)}>
-                                    <Image source={iconBookmark} style={{width: 44, height: 30}} ></Image>
+                                    <Image source={iconBookmarkActive} style={{width: 32, height: 32}} ></Image>
                                     </TouchableOpacity>
                                 )
                                 }
@@ -289,20 +302,22 @@ class RecipeDetails extends Component {
                                 {
                                 this.state.detailsData.isFavorite== false && (
                                     <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.addFavoriteRecipe(this.state.detailsData.id)}>
-                                    <Image source={iconLike} style={{width: 32, height: 30}} ></Image>
+                                    <Image source={iconLike} style={{width: 32, height: 32}} ></Image>
                                     </TouchableOpacity>
                                     )
                                 }
                                 {
                                 this.state.detailsData.isFavorite== true && (
                                     <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.removeFavoriteRecipe(this.state.detailsData.id)}>
-                                    <Image source={iconLike} style={{width: 32, height: 30}} ></Image>
+                                    <Image source={iconLikeActive} style={{width: 32, height: 32}} ></Image>
                                     </TouchableOpacity>
                                 )
                                 }
                             </View>
                             <View style={{width: '15%', height: 50,justifyContent: 'center'}} >
-                                <Image source={iconComment} style={{width: 34, height: 30}} ></Image>
+                                <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.GoToPage('Chat')}>
+                                <Image source={iconComment} style={{width: 32, height: 32}} ></Image>
+                                </TouchableOpacity>
                             </View>
                         </View>
                     </View>

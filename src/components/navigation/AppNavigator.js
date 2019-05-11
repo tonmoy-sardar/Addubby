@@ -22,7 +22,8 @@ import RestaurantSearch from '../RestaurantSearch';
 import Restaurant from '../Restaurant';
 import RestaurantShopping from '../RestaurantShopping';
 import AddRecipe from '../AddRecipe';
-
+import UserProfile from '../UserProfile';
+import Chat from '../Chat';
 
 const iconForTab = ({ state }) => {
   switch (state.routeName) {
@@ -86,6 +87,8 @@ const AppStack = createStackNavigator(
     Restaurant:Restaurant,
     RestaurantShopping:RestaurantShopping,
     AddRecipe:AddRecipe,
+    UserProfile:UserProfile,
+    Chat:Chat,
   },
   {
     initialRouteName: 'LatestRecipes',

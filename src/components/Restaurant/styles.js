@@ -24,6 +24,28 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius:25,
   },
+  SaveButtonStyle: {
+    paddingTop:10,
+    paddingBottom:10,
+    paddingLeft:25,
+    paddingRight:25,
+    backgroundColor:'#d11c21',
+    borderRadius:20,
+  },
+  avatarContainer: {
+    borderColor: '#9B9B9B',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatar: {
+    borderRadius: 75,
+    width: 50,
+    height: 50,
+  },
+  whiteTextTitle:{
+    color:'#fff',
+    textAlign:'center',
+  },
 });
 
 export default styles;

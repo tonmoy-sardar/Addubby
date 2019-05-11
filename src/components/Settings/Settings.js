@@ -16,6 +16,7 @@ import styles from './styles';
 import Footer from '../common/Footer';
 
 import iconAbout from './../../assets/icon_about.png';
+import iconLike from './../../assets/heart_black.png';
 import iconFeedback from './../../assets/icon_feedback.png';
 import iconCommunity from './../../assets/icon_community.png';
 import iconTerms from './../../assets/icon_terms.png';
@@ -103,7 +104,7 @@ class Settings extends Component {
 						<TouchableOpacity style={{height:50}} onPress={()=>this.GoToPage('Favorite')}>
 							<View style={{flex: 1, flexDirection: 'row'}}>
 								<View style={{width: '20%', justifyContent: 'center',alignItems: 'flex-end',}} >
-								<Image source={iconProfileEdit} style={{width: 20, height: 20}} ></Image>
+								<Image source={iconLike} style={{width: 20, height: 20}} ></Image>
 								</View>
 								<View style={{width: '80%', justifyContent: 'center', paddingLeft:15,}}>
 									<Text style={TextStyles.blackTextTitle}>Favorite</Text>

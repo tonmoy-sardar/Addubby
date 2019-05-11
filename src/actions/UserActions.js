@@ -36,7 +36,6 @@ export const login = (data) => async (dispatch) => {
 
       axios.post(API_URL+'/Account/login', data)
       .then(function (response) {
-        //console.log(response.data);
         
         if(response.data.success==true)
         {
@@ -49,39 +48,17 @@ export const login = (data) => async (dispatch) => {
         
       })
       .catch(function (error) {
-        console.log(error);
-        console.log(error.error);
+
         dispatch(loginError(error.error));
       });
 };
 
+export const refresh = (Token) => async (dispatch) => {
 
-export const getUserDetails = (Token) => async (dispatch) => {
-      const AuthStr = 'Bearer ' + Token;
-      console.log("2---"+AuthStr);
-      console.log("3---"+API_URL+'/Account/user');
-      return axios.get(API_URL+'/Account/user', { 'headers': { 'Authorization': AuthStr } });
-};
-
-
-export const updateUserDetails = (Token,data) => async (dispatch) => {
-  const AuthStr = 'Bearer ' + Token;
-  console.log('AuthStr:'+AuthStr);
-  console.log('data:'+JSON.stringify(data));
-  return axios.post(API_URL+'/Account/updateUserProfile',data, { 'headers': { 'Authorization': AuthStr } });
-};
-
-
-
-export const signUp = (data) => async (dispatch) => {
-
-  console.log(data);
-  console.log('data:'+JSON.stringify(data));
   dispatch(loginRequest());
 
-      axios.post(API_URL+'/Account/signup', data)
+      axios.get(API_URL+'/Account/refresh', { 'headers': { 'Authorization': AuthStr } })
       .then(function (response) {
-        console.log(response.data);
         
         if(response.data.success==true)
         {
@@ -94,19 +71,52 @@ export const signUp = (data) => async (dispatch) => {
         
       })
       .catch(function (error) {
-        console.log(error);
-        console.log(error.error);
         dispatch(loginError(error.error));
       });
 };
-// export const signUp = (data) => async (dispatch) => {
-//   console.log('data:'+JSON.stringify(data));
-//   return axios.post(API_URL+'/signup',data);
-// };
+
+
+export const getUserDetails = (Token) => async (dispatch) => {
+      const AuthStr = 'Bearer ' + Token;
+      return axios.get(API_URL+'/Account/user', { 'headers': { 'Authorization': AuthStr } });
+};
+export const getUserProfileDetails = (Token,userName) => async (dispatch) => {
+  const AuthStr = 'Bearer ' + Token;
+  return axios.get(API_URL+'/Account/user/'+userName, { 'headers': { 'Authorization': AuthStr } });
+};
+
+
+export const updateUserDetails = (Token,data) => async (dispatch) => {
+  const AuthStr = 'Bearer ' + Token;
+  return axios.post(API_URL+'/Account/updateUserProfile',data, { 'headers': { 'Authorization': AuthStr } });
+};
+
+
+
+export const signUp = (data) => async (dispatch) => {
+
+  dispatch(loginRequest());
+
+      axios.post(API_URL+'/Account/signup', data)
+      .then(function (response) {
+        
+        if(response.data.success==true)
+        {
+          const user =  response.data;
+          dispatch(loginSuccess(user));
+        }
+        else{
+          dispatch(loginError('Something went wrong!'));
+        }
+        
+      })
+      .catch(function (error) {
+        dispatch(loginError(error.error));
+      });
+};
+
 
 export const logout = () => (dispatch) => {
-
-  
   UserController.logout();
   dispatch(logoutRequest());
 };

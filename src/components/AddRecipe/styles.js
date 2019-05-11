@@ -114,6 +114,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius:25,
   },
+  textInput: {
+    height: 40,
+    borderColor: '#dddddd',
+    borderBottomWidth: 1,
+  },
+  textInputSection:{
+    height: 40,
+    borderColor: '#000000',
+    borderBottomWidth: 1,
+  },
   profileInput: {
     borderColor: '#dddddd',
     borderWidth: 1,

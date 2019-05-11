@@ -110,39 +110,6 @@ class Login extends Component {
           onPress={()=>this.GoToPage('SignUp')}>
             <Text style={styles.BottanTextStyle}> Sign up with Email </Text>
         </TouchableOpacity>
-      
-        {/* <View style={[styles.formContainer, ShadowStyles.shadow]}>
-         
-          <TextField
-            placeholder='Name'
-            onChangeText={this.emailChanged}
-            value={this.state.name}
-          />
-          <TextField
-            placeholder='Email'
-            onChangeText={this.emailChanged}
-            value={this.state.email}
-          />
-          <TextField
-            placeholder='Phone No'
-            onChangeText={this.emailChanged}
-            value={this.state.phoneNo}
-          />
-          <View style={styles.formFooter}>
-            <TouchableOpacity onPress={()=>this.GoToPage('SignIn')}>
-            <Text style={styles.AlreadyRegister}>
-              Already registered with email? Login
-            </Text>
-            </TouchableOpacity>
-            <Text style={styles.TextStyle}>
-            By signing up, you agree to 
-            </Text>
-            <Text style={styles.TextStyle}>
-            our Terms of Service and Privacy Policy.
-            </Text>
-          </View>
-          
-        </View> */}
         </View>
       </ScrollView>
     );

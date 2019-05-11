@@ -20,9 +20,17 @@ import ShadowStyles from '../../helpers/ShadowStyles';
 import Footer from '../common/Footer';
 import OptionsMenu from "react-native-options-menu";
 
-import iconBookmark from './../../assets/icon_bookmark.png';
-import iconLike from './../../assets/icon_like.png';
-import iconComment from './../../assets/icon_comment.png';
+//import iconBookmark from './../../assets/icon_bookmark.png';
+//import iconBookmarkActive from './../../assets/icon_bookmark_active.png';
+import iconBookmark from './../../assets/tag.png';
+import iconBookmarkActive from './../../assets/tag_active.png';
+//import iconLike from './../../assets/icon_like.png';
+//import iconLikeActive from './../../assets/icon_like_active.png';
+
+import iconLike from './../../assets/heart.png';
+import iconLikeActive from './../../assets/heart_active.png';
+import iconComment from './../../assets/conversation.png';
+import iconCommentActive from './../../assets/conversation_active.png';
 import searchLogo from './../../assets/search_logo.png';
 
 
@@ -59,8 +67,6 @@ class LatestRecipes extends Component {
   {
         if(this.props.user!=null)
 		{
-            console.log("1--")
-            console.log('2--'+ JSON.stringify(this.props.user.data));
 
             this.state.token = this.props.user.data;
             this.setState({
@@ -68,14 +74,14 @@ class LatestRecipes extends Component {
             }, () => {
                 this.getListRecipes().then(
                     res => {
-                        console.log(res.data)
+
                         this.state.recipeList=res.data;
                         this.setState({
                             recipeList: res.data.data,
                             animating: false,
                             
                         }, () => {
-                            console.log('ddddd3:'+ JSON.stringify(this.state.recipeList));
+
                         })
                     }
                 );
@@ -88,7 +94,7 @@ class LatestRecipes extends Component {
                         }, () => {
                             this.getUserBookmarkRecipeList(this.state.userName).then(
                                 res => {
-                                    console.log("BookmarkRecipeList" + JSON.stringify(res.data));
+
                                 }
                             )
                         })
@@ -112,29 +118,45 @@ class LatestRecipes extends Component {
   
   
   addBookmarkRecipe = (id) => {
-    console.log(id)
+
     var data = {
         username: this.state.userName,
         recipeid: id
     }
-    console.log(data)    
+  
     this.bookmarkRecipe(data).then(
         res => {
-            console.log("result"+ JSON.stringify(res.data))
+
+            var index = this.state.recipeList.findIndex(x => x.id == id)
+            if(index != -1){
+                let values = [...this.state.recipeList]
+                values[index]['isBookmarked'] = true
+                this.setState({
+                    recipeList: values
+                })
+            }
         }
     )
   };
 
   removeBookmarkRecipe = (id) => {
-    console.log(id)
+
     var data = {
         username: this.state.userName,
         recipeid: id
     }
-    console.log(data)    
+
     this.unbookmarkRecipe(data).then(
         res => {
-            console.log("result"+ JSON.stringify(res.data))
+
+            var index = this.state.recipeList.findIndex(x => x.id == id)
+            if(index != -1){
+                let values = [...this.state.recipeList]
+                values[index]['isBookmarked'] = false
+                this.setState({
+                    recipeList: values
+                })
+            }
         }
     )
   };
@@ -143,29 +165,45 @@ class LatestRecipes extends Component {
   favoriteRecipe = (data) => this.props.favoriteRecipe(this.state.token, data);
 
   addFavoriteRecipe = (id) => {
-    console.log(id)
+
     var data = {
         username: this.state.userName,
         recipeid: id
     }
-    console.log(data)    
+    
     this.favoriteRecipe(data).then(
         res => {
-            console.log("result"+ JSON.stringify(res.data))
+
+            var index = this.state.recipeList.findIndex(x => x.id == id)
+            if(index != -1){
+                let values = [...this.state.recipeList]
+                values[index]['isFavorite'] = true
+                this.setState({
+                    recipeList: values
+                })
+            }
         }
     )
   };
 
   removeFavoriteRecipe = (id) => {
-    console.log(id)
+
     var data = {
         username: this.state.userName,
         recipeid: id
     }
-    console.log(data)    
+  
     this.unfavoriteRecipe(data).then(
         res => {
-            console.log("result"+ JSON.stringify(res.data))
+
+            var index = this.state.recipeList.findIndex(x => x.id == id)
+            if(index != -1){
+                let values = [...this.state.recipeList]
+                values[index]['isFavorite'] = false
+                this.setState({
+                    recipeList: values
+                })
+            }
         }
     )
   };
@@ -182,17 +220,24 @@ class LatestRecipes extends Component {
   }
 
   GoDetailspage = (id) =>{
-      console.log(id);
+
     this.props.navigation.navigate('RecipeDetails',{id: id});
   }
 
-  DetailsView = () =>{
-    console.log("Details")
+  DetailsView = (id) =>{
+
+    this.props.navigation.navigate('RecipeDetails',{id: id});
+  }
+
+  DetailsUserProfile = (userName) =>{
+
+    this.props.navigation.navigate('UserProfile',{userName: userName});
   }
 
   updateSearch = search => {
     this.setState({ search:search });
   };
+
   onEnd = () =>{
     this.props.navigation.navigate('RestaurantSearch',{name: this.state.search});
   }
@@ -208,10 +253,14 @@ class LatestRecipes extends Component {
                 <View style={{flex: 1, flexDirection: 'row'}}>
                     <View style={{width: '15%', height: 50, justifyContent: 'center'}} >
                         {/* <Avatar rounded icon={{ name: 'user',type: 'font-awesome' }}  /> */}
+                        <TouchableOpacity activeOpacity = { .5 } onPress={()=>this.DetailsUserProfile(item.userDetails.name)}>
                         <Avatar small rounded  activeOpacity={0.7}   source={{ uri: item.userDetails.imageUrl}} />
+                        </TouchableOpacity>
                     </View>
                     <View style={{width: '55%', height: 50, justifyContent: 'center'}}>
+                        <TouchableOpacity  activeOpacity = { .5 } onPress={()=>this.DetailsUserProfile(item.userDetails.name)}>
                         <Text style={TextStyles.whiteText}>{item.userDetails.name}</Text>
+                        </TouchableOpacity>
                     </View>
                     <View style={{width: '20%', height: 50, justifyContent: 'center'}} >
                         <TouchableOpacity style={styles.FollowButtonStyle} activeOpacity = { .5 }>
@@ -219,7 +268,7 @@ class LatestRecipes extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={{width: '10%', height: 50,justifyContent: 'center'}} >
-                        <OptionsMenu button={MoreIcon} buttonStyle={{ width: 10, height: 19,marginLeft: 15, resizeMode: "contain" }} destructiveIndex={1} options={["Details"]} actions={[this.DetailsView]}/>
+                        <OptionsMenu button={MoreIcon} buttonStyle={{ width: 10, height: 19,marginLeft: 15, resizeMode: "contain" }} destructiveIndex={1} options={["Details"]} actions={[this.DetailsView.bind(this,item.id)]}/>
                     </View>
                 </View>
             </View>
@@ -236,14 +285,14 @@ class LatestRecipes extends Component {
                         {
                         item.isBookmarked== false && (
                             <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.addBookmarkRecipe(item.id)}>
-                            <Image source={iconBookmark} style={{width: 44, height: 30}} ></Image>
+                            <Image source={iconBookmark} style={{width: 32, height: 32}} ></Image>
                             </TouchableOpacity>
                             )
                         }
                         {
                         item.isBookmarked== true && (
                             <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.removeBookmarkRecipe(item.id)}>
-                            <Image source={iconBookmark} style={{width: 44, height: 30}} ></Image>
+                            <Image source={iconBookmarkActive} style={{width: 32, height: 32}} ></Image>
                             </TouchableOpacity>
                          )
                         }
@@ -252,33 +301,37 @@ class LatestRecipes extends Component {
                         {
                         item.isFavorite== false && (
                             <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.addFavoriteRecipe(item.id)}>
-                            <Image source={iconLike} style={{width: 32, height: 30}} ></Image>
+                            <Image source={iconLike} style={{width: 32, height: 32}} ></Image>
                             </TouchableOpacity>
                             )
                         }
                         {
                         item.isFavorite== true && (
                             <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.removeFavoriteRecipe(item.id)}>
-                            <Image source={iconLike} style={{width: 32, height: 30}} ></Image>
+                            <Image source={iconLikeActive} style={{width: 32, height: 32}} ></Image>
                             </TouchableOpacity>
                          )
                         }
                         
                     </View>
                     <View style={{width: '15%', height: 50,justifyContent: 'center'}} >
-                        <Image source={iconComment} style={{width: 34, height: 30}} ></Image>
+                        <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.GoToPage('Chat')}>
+                        <Image source={iconComment} style={{width: 32, height: 32}} ></Image>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
             <View style={{ width: '100%',paddingLeft:10, paddingRight:10}}>
                 <View style={{flex: 1, flexDirection: 'row'}}>
-                    <View style={{width: '80%',justifyContent: 'center'}}>
-                        <Text style={TextStyles.redTextTitle}> {item.name}</Text>
+                    <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.GoDetailspage(item.id)}>
+                    <View style={{width: '80%',paddingTop:10,justifyContent: 'center'}}>
+                        <Text style={TextStyles.redTextTitle}>{item.name}</Text>
                         <Text style={TextStyles.grayText}>{item.description}  # Lunch</Text>
                     </View>
                     <View style={{width: '20%', height: 50, justifyContent: 'center'}} >
                         <Text style={TextStyles.grayText}>3 Min Ago</Text>
                     </View>
+                    </TouchableOpacity>
                 </View>
             </View>
         </View>

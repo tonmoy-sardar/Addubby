@@ -56,8 +56,6 @@ class Bookmark extends Component {
   {
         if(this.props.user!=null)
 		{
-            console.log("1--")
-            console.log('2--'+ JSON.stringify(this.props.user.data));
 
             this.state.token = this.props.user.data;
             this.setState({
@@ -72,15 +70,13 @@ class Bookmark extends Component {
                         }, () => {
                             this.getUserBookmarkRecipeList(this.state.userName).then(
                                 res => {
-                                    console.log("BookmarkRecipeList" + JSON.stringify(res.data));
-                                    console.log(res.data)
+
                                     this.state.bookmarkList=res.data;
                                     this.setState({
                                         bookmarkList: res.data.data,
                                         animating: false,
                                         
                                     }, () => {
-                                        console.log('ddddd3:'+ JSON.stringify(this.state.bookmarkList));
                                     })
                                 }
                             )
@@ -101,32 +97,29 @@ class Bookmark extends Component {
   searchInBookmarks = (data) => this.props.searchInBookmarks(this.state.token, data);
   
   searchBookmarks = (name) => {
-    console.log(name)
+
     var data = {
         username: this.state.userName,
         name: name
     }
-    console.log(data)    
+
     this.searchInBookmarks(data).then(
         res => {
-            console.log("result"+ JSON.stringify(res.data))
-            console.log(res.data)
+
             this.state.bookmarkList=res.data;
             this.setState({
                 bookmarkList: res.data.data,
             }, () => {
-                console.log('ddddd3:'+ JSON.stringify(this.state.bookmarkList));
+
             })
         }
     )
   };
 
   GoDetailspage = (id) =>{
-      console.log(id);
+
     this.props.navigation.navigate('RecipeDetails',{id: id});
   }
-
-   
 
     toggleStatus = () =>{
     //this.state.textBoxShow = true;
@@ -148,19 +141,23 @@ render() {
 
     <View style={[styles.cardContainer]}  key={i}>
         <View style={{ width: '100%'}}>
+            <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.GoDetailspage(item.id)}>
             <View style={{flex: 1, flexDirection: 'row'}}>
+                
                 <View style={{width: '30%', justifyContent: 'center'}} >
-                    <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.GoDetailspage(item.id)}>
+                    
                     {/* <Image source={bookmarkImage} style={{width: '100%', height: 100,borderTopLeftRadius:10,borderBottomLeftRadius:10,}} ></Image> */}
                     <ImageLoad style={{width: '100%', height: 100}}  loadingStyle={{ size: 'large', color: 'blue' }}
                         source={{ uri: item.imageUrl }}/>
-                    </TouchableOpacity>
+                   
                 </View>
                 <View style={{width: '70%', padding:20}}>
                     <Text style={TextStyles.redTextTitle}>{item.name}</Text>
                     <Text style={TextStyles.grayText}>{item.description}</Text>
                 </View>
+                
             </View>
+            </TouchableOpacity>
         </View>
     </View>
     )

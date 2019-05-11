@@ -18,9 +18,6 @@ import getUser from '../../selectors/UserSelectors';
 import styles from './styles';
 import Footer from '../common/Footer';
 
-
-
-
 import searchLogo from './../../assets/search_logo.png';
 import ImageLoad from 'react-native-image-placeholder';
 
@@ -53,8 +50,6 @@ class Favorite extends Component {
   {
         if(this.props.user!=null)
 		{
-            console.log("1--")
-            console.log('2--'+ JSON.stringify(this.props.user.data));
 
             this.state.token = this.props.user.data;
             this.setState({
@@ -69,15 +64,13 @@ class Favorite extends Component {
                         }, () => {
                             this.getUserFavoriteRecipeList(this.state.userName).then(
                                 res => {
-                                    console.log("FavoriteRecipeList" + JSON.stringify(res.data));
-                                    console.log(res.data)
+
                                     this.state.favoriteList=res.data;
                                     this.setState({
                                         favoriteList: res.data.data,
                                         animating: false,
                                         
                                     }, () => {
-                                        console.log('ddddd3:'+ JSON.stringify(this.state.favoriteList));
                                     })
                                 }
                             )
@@ -99,7 +92,7 @@ class Favorite extends Component {
   
 
   GoDetailspage = (id) =>{
-      console.log(id);
+ 
     this.props.navigation.navigate('RecipeDetails',{id: id});
   }
 
@@ -124,19 +117,21 @@ render() {
 
     <View style={[styles.cardContainer]}  key={i}>
         <View style={{ width: '100%'}}>
+        <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.GoDetailspage(item.id)}>
             <View style={{flex: 1, flexDirection: 'row'}}>
                 <View style={{width: '30%', justifyContent: 'center'}} >
-                    <TouchableOpacity activeOpacity = { .5 } style={{width: '100%'}} onPress={()=>this.GoDetailspage(item.id)}>
+                    
                     
                     <ImageLoad style={{width: '100%', height: 100}}  loadingStyle={{ size: 'large', color: 'blue' }}
                         source={{ uri: item.imageUrl }}/>
-                    </TouchableOpacity>
+                    
                 </View>
                 <View style={{width: '70%', padding:20}}>
                     <Text style={TextStyles.redTextTitle}>{item.name}</Text>
                     <Text style={TextStyles.grayText}>{item.description}</Text>
                 </View>
             </View>
+            </TouchableOpacity>
         </View>
     </View>
     )

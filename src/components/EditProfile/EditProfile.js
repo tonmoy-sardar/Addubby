@@ -59,34 +59,32 @@ class EditProfile extends Component {
     {
         if(this.props.user!=null)
 		{
-            console.log("aaa")
-            console.log('bbbb1'+ JSON.stringify(this.props.user.data));
 
             this.state.token = this.props.user.data;
             this.setState({
                 token: this.props.user.data
             }, () => {
-                console.log('cccc:'+ this.state.token);
+
                 this.getUserDetails(this.state.token).then(
                     res => {
-                        console.log(res.data)
+
                         if(res.data.success==true)
         				{
-                            console.log(res.data)
+
                             let values = {...this.state.data};
                             values['Name'] = res.data.data.profile.name;
                             values['LastName'] = res.data.data.profile.lastName;
                             values['City'] = res.data.data.profile.city;
                             values['Description'] = res.data.data.profile.description;
                             
-                            console.log(values)
+
                             this.setState({
                                 detailsData: res.data,
                                 animating: false,
                                 data: values
                                 // visible: !this.state.visible
                             }, () => {
-                                    console.log('ddddd3:'+ JSON.stringify(this.state.detailsData.data.username));
+ 
                                 })
                         }
 						else{
@@ -100,42 +98,16 @@ class EditProfile extends Component {
 					this.setState({
 						animating: false,
 					})
-					console.log(err);
-					console.log(err.error);
 					
 				  });
-                // this.getUserDetails(this.state.token).then(
-                //     res => {
-                //         console.log(res.data)
-                //         let values = {...this.state.data};
-                //         values['Name'] = res.data.data.profile.name;
-                //         values['LastName'] = res.data.data.profile.lastName;
-                //         values['City'] = res.data.data.profile.city;
-                //         values['Description'] = res.data.data.profile.description;
-                        
-                //         console.log(values)
-                //         this.setState({
-                //             detailsData: res.data,
-                //             animating: false,
-                //             data: values
-                //             // visible: !this.state.visible
-                //         }, () => {
-                //             console.log('ddddd3:'+ JSON.stringify(this.state.detailsData.data.username));
-                //         })
-                //         // this.state.detailsData = res.data
-                        
-                //     }
-                // );
+                
             })
         }
         
     }
 
     componentDidUpdate() {
-        if(this.props.user!=null)
-		{
-            console.log('bbbb11'+ JSON.stringify(this.props.user.data));
-        }
+       
     }
 
     getUserDetails = () => this.props.getUserDetails(this.state.token);
@@ -159,7 +131,7 @@ class EditProfile extends Component {
         else{
             this.props.updateUserDetails(this.state.token, this.state.data).then(
                 res => {
-                    console.log(res.data);
+                   
                 }
             )
         }
@@ -176,7 +148,7 @@ class EditProfile extends Component {
         {
             if(text=='')
             {
-                console.log('invalid');
+                
                 values['Name'] = text;
                 this.setState({ data: values });
                 this.setState({ 

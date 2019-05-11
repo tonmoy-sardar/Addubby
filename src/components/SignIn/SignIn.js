@@ -54,7 +54,6 @@ class SignIn extends Component {
     }
 
     navigateToHomeIfLogged = () => {
-        console.log('user:'+this.props.user);
         
         if (this.props.user !== null) {
            
@@ -64,8 +63,6 @@ class SignIn extends Component {
     
 
     GoToPage = (page) =>{
-
-        //console.log(page);
         this.props.navigation.navigate(page);
     }
 
@@ -118,12 +115,6 @@ class SignIn extends Component {
         }
     }
 
-    // passwordChanged = value => this.setState({ Password: value });
-
-    // userNameChanged = value => this.setState({ Username: value }, () => {
-    //     console.log(this.state.Username)
-    // });
-
     
     login = () => {
 
@@ -148,7 +139,6 @@ class SignIn extends Component {
         }
         
     };
-    //login = () => this.props.login(this.state.Username, this.state.Password);
     
 
     render() {

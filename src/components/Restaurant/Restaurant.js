@@ -5,6 +5,7 @@ import {
     Image,
     ScrollView,
     TextInput,
+    TouchableOpacity,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -17,18 +18,120 @@ import styles from './styles';
 import Footer from '../common/Footer';
 
 
+import iconback from './../../assets/icon_back.png';
 import bookmarkImage from './../../assets/bookmark.png';
 import bookmark1Image from './../../assets/bookmark1.png';
 import bookmark2Image from './../../assets/bookmark2.png';
 
 import iconCamera from './../../assets/icon_camera.png';
 import btnRestaurantAdd from './../../assets/btn_restaurant_add.png';
+import { getUserDetails } from '../../actions/UserActions';
+import { addRestaurant } from '../../actions/RecipeActions';
+
+import ImagePicker from 'react-native-image-picker';
 
 class Restaurant extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            switchValue: false,
+            token: '',
+            detailsData: {},
+            animating: true,
+            avatarSource: null,
+            data:{
+                name :'',
+                description:'',
+                images:'',
+               
+            }
+         }
+         this.selectPhotoTapped = this.selectPhotoTapped.bind(this);
     }
+
+    selectPhotoTapped() {
+        const options = {
+          quality: 1.0,
+          maxWidth: 500,
+          maxHeight: 500,
+          storageOptions: {
+            skipBackup: true,
+          },
+        };
+    
+        ImagePicker.showImagePicker(options, (response) => {
+          console.log('Response = ', response);
+    
+          if (response.didCancel) {
+            console.log('User cancelled photo picker');
+          } else if (response.error) {
+            console.log('ImagePicker Error: ', response.error);
+          } else if (response.customButton) {
+            console.log('User tapped custom button: ', response.customButton);
+          } else {
+            //let source = { uri: response.uri };
+    
+            // You can also display the image using data:
+            let source = { uri: 'data:image/jpeg;base64,' + response.data };
+            
+            let values = {...this.state.data}
+            values['images'] = source
+            this.setState({
+                data: values,
+            }, () => {
+                console.log("avatarSource-->"+this.state.data.images)
+            });
+          }
+        });
+      }
+    
+      componentDidMount()
+    {
+        if(this.props.user!=null)
+		{
+
+
+            this.state.token = this.props.user.data;
+            this.setState({
+                token: this.props.user.data
+            }, () => {
+
+                this.getUserDetails(this.state.token).then(
+                    res => {
+
+                        if(res.data.success==true)
+        				{
+
+                            let values = {...this.state.data};
+                            values['userDetails']['name'] = res.data.data.profile.name;
+                           
+                            
+                            this.setState({
+                                data: values
+                                    // visible: !this.state.visible
+                                }, () => {
+
+                                })
+                        }
+						else{
+							
+						}
+                    }
+				)
+				.catch(err => {
+					
+					console.log(err);
+					console.log(err.error);
+					
+				  });
+                
+            })
+        }
+        
+    }
+
+    getUserDetails = () => this.props.getUserDetails(this.state.token);
 
     static navigationOptions = {
         header: null,
@@ -62,28 +165,81 @@ class Restaurant extends Component {
     }
 
 
+    changeAndSetText(text,type)
+    {
+        let values = {...this.state.data};
+        if(type=='name')
+        {
+            values['name'] = text;
+            this.setState({ data: values });    
+        }
+        if(type=='description')
+        {
+            values['description'] = text;
+            this.setState({ data: values });    
+        }
+    }
+
+    addRestaurant = () => {
+        
+        this.props.addRestaurant(this.state.token, this.state.data).then(
+            res => {
+
+                this.props.navigation.navigate('RestaurantRecipe');
+            }
+        )
+       
+    };
 
 render() {
     const MoreIcon = require("./../../assets/btn_restaurant_add.png");
     return (
         <View style={{flex: 1}}>
-            
+            <View style={{ width: '100%' ,backgroundColor:'#f8f8f8', height:50}}>
+                <View style={{ flex: 1 ,flexDirection: 'row',justifyContent: 'center'}} >
+                    <View style={{width: '10%', justifyContent: 'center', paddingLeft:10,}} >
+                        <TouchableOpacity onPress={()=>this.GoToPage('Profile')}>
+                            <Image source={iconback} style={{width: 26, height: 15}} ></Image>
+                        </TouchableOpacity>
+                    </View>
+                    
+                    <View style={{width: '90%',  justifyContent: 'center',alignItems: 'flex-end',paddingRight:10, }}>
+                        <TouchableOpacity style={styles.SaveButtonStyle} activeOpacity = { .5 } onPress={this.addRestaurant}>
+                            <Text style={styles.whiteTextTitle}> Save </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
             <ScrollView contentContainerStyle={styles.contentContainer}>
                 <View  style={{ margin: 10,}}>
                     <View style={{width: '100%', justifyContent: 'center'}} >
-                        <TextInput style = {styles.formInput}  placeholder = "Restaurant Name" />
+                       
+                        <TextInput style = {styles.formInput}  placeholder = "Restaurant Name" onChangeText={(text)=>this.changeAndSetText(text,'name')} value={this.state.data.name}/>
                     </View>
                 </View>
                 <View  style={{ margin: 10,}}>
                     <View style={{width: '100%', justifyContent: 'center'}} >
-                        <TextInput style = {styles.formInput}  placeholder = "Description" />
+                        
+                        <TextInput style = {styles.formInput}  placeholder = "Description" onChangeText={(text)=>this.changeAndSetText(text,'description')} value={this.state.data.description}/>
                     </View>
                 </View>
                 <View style={[styles.cardContainer]} >
                     <View style={{ width: '100%'}}>
                         <View style={{flex: 1, flexDirection: 'row'}}>
                             <View style={{width: '100%', padding:30, justifyContent: 'center',alignItems: 'center',}}>
-                                <Image source={iconCamera} style={{width: 51, height: 40}} ></Image>
+                                <TouchableOpacity onPress={this.selectPhotoTapped.bind(this)}>
+                                        <View style={[
+                                styles.avatar,
+                                styles.avatarContainer,
+                                
+                                ]}>
+                                    {this.state.data.images == '' ? (
+                                    <Image source={iconCamera} style={{width: 51, height: 40}} ></Image>
+                                    ) : (
+                                    <Image style = {styles.avatar} source={this.state.data.images} />
+                                    )}
+                                </View>
+                                </TouchableOpacity>
                                 <View style={{paddingTop:20,}}>
                                     <Text style={TextStyles.blackTextTitle}>Upload Photo</Text>
                                 </View>
@@ -153,6 +309,8 @@ render() {
 }
 
 Restaurant.propTypes = {
+    getUserDetails: PropTypes.func.isRequired,
+    addRestaurant: PropTypes.func.isRequired,
     user: PropTypes.object,
 };
 
@@ -164,5 +322,10 @@ const mapStateToProps = state => ({
     user: getUser(state),
 });
 
-const mapDispatchToProps = () => ({});
+const mapDispatchToProps = dispatch => ({
+    getUserDetails: (Token) => dispatch(getUserDetails(Token)),
+    addRestaurant:(Token,data) => dispatch(addRestaurant(Token,data)),
+    
+  });
+
 export default connect(mapStateToProps, mapDispatchToProps)(Restaurant);

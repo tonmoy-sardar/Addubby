@@ -19,7 +19,7 @@ import getUser from '../../selectors/UserSelectors';
 import styles from './styles';
 import Footer from '../common/Footer';
 
-import { getUserDetails } from '../../actions/UserActions';
+import { getUserProfileDetails } from '../../actions/UserActions';
 import profileImage from './../../assets/profile_image.png';
 
 import iconSetting from './../../assets/icon_setting.png';
@@ -30,13 +30,14 @@ import iconSearch from './../../assets/icon_serach.png';
 
 
 
-class Profile extends Component {
+class UserProfile extends Component {
 
 	
 	constructor(props) {
 		super(props);
 		this.state = {
 			token: '',
+			userName:'',
 			detailsData: {},
 			animating: true
 		};
@@ -60,10 +61,11 @@ class Profile extends Component {
 			this.state.token = this.props.user.data;
 
 			this.setState({
-                token: this.props.user.data
+				token: this.props.user.data,
+				userName:this.props.navigation.state.params.userName,
             }, () => {
 
-                this.getUserDetails(this.state.token).then(
+                this.getUserProfileDetails(this.state.token,this.state.userName).then(
                     res => {
 
                         if(res.data.success==true)
@@ -73,7 +75,6 @@ class Profile extends Component {
 								animating: false,
 								
 							}, () => {
-
 							})
 						}
 						else{
@@ -87,6 +88,8 @@ class Profile extends Component {
 					this.setState({
 						animating: false,
 					})
+					console.log(err);
+					console.log(err.error);
 					
 				  });
             })
@@ -98,12 +101,13 @@ class Profile extends Component {
 
 	navigateToHomeIfLogged = () => {
 
+		
         if (this.props.user !== null) {
            
         }
 	}
 	
-	getUserDetails = () => this.props.getUserDetails(this.state.token);
+	getUserProfileDetails = () => this.props.getUserProfileDetails(this.state.token,this.state.userName);
     
 
 	getMessage = () => {
@@ -116,7 +120,6 @@ class Profile extends Component {
     }
 
 	render() {
-		
 		const MoreIcon = require("./../../assets/option_menu.png");
 		const { visible } = this.state;
 		return (
@@ -177,64 +180,7 @@ class Profile extends Component {
 								</View>
 							</View>
 						</View>
-						<View style={{ width: '90%'}}>
-							<View style={{flex: 1, flexDirection: 'row', paddingTop:10,}}>
-								<View style={{width: '82%',  justifyContent: 'center',alignItems: 'center',}}>
-									<TouchableOpacity style={styles.ContinueButtonStyle} activeOpacity = { .5 }onPress={()=>this.GoToPage('EditProfile')}>
-										<Text style={styles.TextStyle}> Edit Profile </Text>
-									</TouchableOpacity>
-								</View>
-								<View style={{width: '18%',  justifyContent: 'center',alignItems: 'center', paddingTop:20,}} >
-									<TouchableOpacity  activeOpacity = { .5 } onPress={()=>this.GoToPage('Settings')}>
-										<Image source={iconSetting} style={{width: 44, height: 44}} ></Image>
-									</TouchableOpacity>
-								</View>
-							</View>
-						</View>
-						<View style={{ width: '90%'}}>
-							<View style={{width: '100%',  justifyContent: 'center',alignItems: 'center',}}>
-								<TouchableOpacity style={styles.otherButtonStyle} activeOpacity = { .5 }>
-									<Text style={styles.blackTextTitle}> Connections </Text>
-								</TouchableOpacity>
-							</View>
-							<View style={{width: '100%',  justifyContent: 'center',alignItems: 'center',}}>
-								<TouchableOpacity style={styles.otherButtonStyle} activeOpacity = { .5 }>
-									<Text style={styles.blackTextTitle}> Cooksnaps </Text>
-								</TouchableOpacity>
-							</View>
-							<View style={{flex: 1, flexDirection: 'row', paddingTop:20,}}>
-								<View style={{width: '33%',  justifyContent: 'center',alignItems: 'center',}}>
-									<Text style={TextStyles.blackTextTitle}>0</Text>
-								</View>
-								<View style={{width: '33%',  justifyContent: 'center',alignItems: 'center',}} >
-									<Text style={TextStyles.blackTextTitle}>0</Text>
-								</View>
-								<View style={{width: '33%',  justifyContent: 'center',alignItems: 'center',}} >
-									<Text style={TextStyles.blackTextTitle}>0</Text>
-								</View>
-							</View>
-							<View style={{flex: 1, flexDirection: 'row',paddingTop:5,}}>
-								<View style={{width: '33%', justifyContent: 'center',alignItems: 'center',}}>
-									<Text style={TextStyles.blackTextTitle}>Private</Text>
-								</View>
-								<View style={{width: '33%',  justifyContent: 'center',alignItems: 'center',}} >
-									<Text style={TextStyles.blackTextTitle}>Published</Text>
-								</View>
-								<View style={{width: '33%',  justifyContent: 'center',alignItems: 'center',}} >
-									<Text style={TextStyles.blackTextTitle}>Cooksnap</Text>
-								</View>
-							</View>
-							<View style={{width: '100%',  justifyContent: 'center',alignItems: 'center',}}>
-								<TouchableOpacity style={styles.ContinueButtonStyle} activeOpacity = { .5 } onPress={()=>this.GoToPage('AddRecipe')}>
-									<Text style={styles.TextStyle}> Add Recipes </Text>
-								</TouchableOpacity>
-							</View>
-							<View style={{width: '100%',  justifyContent: 'center',alignItems: 'center',}}>
-								<TouchableOpacity style={styles.ContinueButtonStyle} activeOpacity = { .5 } onPress={()=>this.GoToPage('Restaurant')}>
-									<Text style={styles.TextStyle}> Add Restaurent </Text>
-								</TouchableOpacity>
-							</View>
-						</View>
+						
 					</View>
 				</ScrollView>
 					<Footer></Footer>
@@ -248,12 +194,12 @@ class Profile extends Component {
 		}
 	}
 
-	Profile.propTypes = {
-		getUserDetails: PropTypes.func.isRequired,
+	UserProfile.propTypes = {
+		getUserProfileDetails: PropTypes.func.isRequired,
 		user: PropTypes.object,
 	};
 
-	Profile.defaultProps = {
+	UserProfile.defaultProps = {
 		user: null,
 	};
 
@@ -262,8 +208,8 @@ class Profile extends Component {
 	});
 
 	const mapDispatchToProps = dispatch => ({
-		getUserDetails: (Token) => dispatch(getUserDetails(Token)),
+		getUserProfileDetails: (Token,userName) => dispatch(getUserProfileDetails(Token,userName)),
 		
 	  });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Profile);
+export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);
